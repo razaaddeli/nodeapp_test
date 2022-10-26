@@ -1,35 +1,38 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
-   name: nodeapp-deployment
-   labels:
+  name: nodeapp-deployment
+  labels:
     app: nodeapp
 spec:
-   replicas: 1
-   selector:      # tells the controller which pods to watch/belong to
+  replicas: 1
+  selector:
     matchLabels:
-     name: nodeapp
-   template:
-     metadata:
-        labels:
-         name: nodeapp
-     spec:
+      app: nodeapp
+  template:
+    metadata:
+      labels:
+        app: nodeapp 
+    spec:
       containers:
-        - name: nodeserver
-          image: http
-          ports:
-          - containerPort: 80
+      - name: nodeserver
+        image: thetips4you/nodeapp:latest
+        ports:
+        - containerPort: 3000
+        
         
 ---
 
-kind: Service                             # Defines to create Service type Object
 apiVersion: v1
+kind: Service
 metadata:
   name: nodeapp-service
 spec:
-  ports:
-    - port: 80                               # Containers port exposed
-      targetPort: 80                    # Pods port
   selector:
-    name: nodeapp                    # Apply this service to any pods which has the specific label
-  type: NodePort                       # Specifies the service type i.e ClusterIP or NodePort
+    app: nodeapp 
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 3000
+    nodePort: 31110
